@@ -4,16 +4,17 @@ import { Typography, Row, Col, Statistic } from 'antd';
 import { Link } from 'react-router-dom';
 
 import { useGetCryptosQuery } from '../services/cryptoApi';
-import { Cryptocurrencies, News } from '../components'
+import { News, Cryptocurrencies } from '../components'
 
 const { Title } = Typography;
 
 
 const Homepage = () => {
-  const {data: cryptosList, isFetching} = useGetCryptosQuery();
+  const {data: cryptosList, isFetching} = useGetCryptosQuery(10);
   const globalStats = cryptosList?.data?.stats;
 
   if(isFetching) return 'Loading...';
+
   return (
     <>
       <Title level={2} className="heading"> Global Crypto Stats </Title>
@@ -28,12 +29,12 @@ const Homepage = () => {
         <Title level={2} className='home-title'> Top 10 Cryptocurrencies</Title>
         <Title level={3} className='show-more'><Link to="/cryptocurrencies">Show more</Link></Title>
       </div>
-      <Cryptocurrencies simplified/>
+      <Cryptocurrencies simplified={true} />
       <div className='home-heading-container'>
         <Title level={2} className='home-title'> Latest crypto news</Title>
         <Title level={3} className='show-more'><Link to="/news">Show more</Link></Title>
       </div>
-      <News simplified/>
+      <News simplified />
     </>
   )
 }
