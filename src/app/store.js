@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { cryptoApi } from '../services/cryptoApi';
+import { cryptoNewsApi } from '../services/cryptoNewsApi';
 import thunk from 'redux-thunk';
 import {
   FLUSH,
@@ -13,7 +14,7 @@ import {
 export default configureStore({
   reducer: {
     [cryptoApi.reducerPath]: cryptoApi.reducer,
-    //[cryptoNewsApi.reducerPath]: cryptoNewsApi.reducer,
+    [cryptoNewsApi.reducerPath]: cryptoNewsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -22,6 +23,7 @@ export default configureStore({
       },
     }).concat(
       thunk,
-      cryptoApi.middleware
+      cryptoApi.middleware,
+      cryptoNewsApi.middleware,
     ),
 });
