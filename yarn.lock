@@ -8568,7 +8568,7 @@
   dependencies:
     "picomatch" "^2.2.1"
 
-"recharts-scale@^0.4.4":
+"recharts-scale@^0.4.4", "recharts-scale@^0.4.5":
   "integrity" "sha512-kivNFO+0OcUNu7jQquLXAxz1FIwZj8nrj+YkOKc5694NbjCvcT6aSZiIzNzd2Kul4o4rTto8QVR9lMNtxD4G1w=="
   "resolved" "https://registry.npmjs.org/recharts-scale/-/recharts-scale-0.4.5.tgz"
   "version" "0.4.5"

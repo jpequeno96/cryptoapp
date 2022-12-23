@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import HTMLReactParser from 'html-react-parser';
 import { useParams } from 'react-router-dom';
 import millify from 'millify';
-import { Col, Row, Typography, Select } from 'antd';
+import { Collapse, Col, Row, Typography, Select, Avatar  } from 'antd';
 import { MoneyCollectOutlined, DollarCircleOutlined, FundOutlined, ExclamationCircleOutlined, StopOutlined, TrophyOutlined, CheckOutlined, NumberOutlined, ThunderboltOutlined } from '@ant-design/icons';
 
-import { useGetCryptoDetailsQuery, useGetCryptoHistoryQuery } from '../services/cryptoApi';
-import CryptoLineChart from './CryptoLineChart';
+import { useGetCryptoDetailsQuery, useGetCryptoHistoryQuery, useGetCoinExchangesQuery } from '../services/cryptoApi';
+import LineChart from './LineChart';
 
 const { Title, Text } = Typography;
+const { Panel } = Collapse;
 const { Option } = Select;
 
 const CryptoDetails = () => {
@@ -16,9 +17,12 @@ const CryptoDetails = () => {
   const [timeperiod, setTimeperiod] = useState('7d');
   const { data, isFetching } = useGetCryptoDetailsQuery(coinId);
   const { data: coinHistory } = useGetCryptoHistoryQuery({ coinId, timeperiod });
+  const { data: coinExchanges, isFetch } = useGetCoinExchangesQuery(coinId);
   const cryptoDetails = data?.data?.coin;
+  const cryptoExchanges = coinExchanges?.data?.exchanges;
 
   if (isFetching) return "Loading...";
+  if (isFetch) return "Loading...";
 
   const time = ['3h', '24h', '7d', '30d', '1y', '3m', '3y', '5y'];
 
@@ -33,7 +37,7 @@ const CryptoDetails = () => {
   const genericStats = [
     { title: 'Number Of Markets', value: cryptoDetails?.numberOfMarkets, icon: <FundOutlined /> },
     { title: 'Number Of Exchanges', value: cryptoDetails?.numberOfExchanges, icon: <MoneyCollectOutlined /> },
-    { title: 'Aprroved Supply', value: cryptoDetails?.supply?.confirmed ? <CheckOutlined /> : <StopOutlined />, icon: <ExclamationCircleOutlined /> },
+    { title: 'Aproved Supply', value: cryptoDetails?.supply?.confirmed ? <CheckOutlined /> : <StopOutlined />, icon: <ExclamationCircleOutlined /> },
     { title: 'Total Supply', value: `$ ${cryptoDetails?.supply?.total && millify(cryptoDetails?.supply?.total)}`, icon: <ExclamationCircleOutlined /> },
     { title: 'Circulating Supply', value: `$ ${cryptoDetails?.supply?.circulating && millify(cryptoDetails?.supply?.circulating)}`, icon: <ExclamationCircleOutlined /> },
   ];
@@ -49,7 +53,7 @@ const CryptoDetails = () => {
       <Select defaultValue="7d" className="select-timeperiod" placeholder="Select Timeperiod" onChange={(value) => setTimeperiod(value)}>
         {time.map((date) => <Option key={date}>{date}</Option>)}
       </Select>
-      <CryptoLineChart coinHistory={coinHistory} currentPrice={millify(cryptoDetails?.price)} coinName={cryptoDetails?.name} />
+      <LineChart coinHistory={coinHistory} currentPrice={millify(cryptoDetails?.price)} coinName={cryptoDetails?.name} />
       <Col className="stats-container">
         <Col className="coin-value-statistics">
           <Col className="coin-value-statistics-heading">
@@ -97,6 +101,35 @@ const CryptoDetails = () => {
           ))}
         </Col>
       </Col>
+      <Title level={3} className="coin-details-heading">{cryptoDetails.name} Exchanges</Title>
+          <Row>
+            <Col span={8}>Exchanges</Col>
+            <Col span={8}>Recommended</Col>
+            <Col span={8}>Nr. Markets</Col>
+          </Row>
+          {cryptoExchanges.map((exchange) => (
+            <Col>
+              <Collapse>
+              <Panel
+                key={exchange.uuid}
+                showArrow={false}
+                header={(
+                  <Row key={exchange.uuid}>
+                    <Col span={8}>
+                      <Text><strong>{exchange.rank}.</strong></Text>
+                      <Avatar className="exchange-image" src={exchange.iconUrl} />
+                      <Text><strong>{exchange.name}</strong></Text>
+                    </Col>
+                    <Col span={8}>{exchange.recommended ? <CheckOutlined /> : <StopOutlined />}</Col>
+                    <Col span={8}>{millify(exchange.numberOfMarkets)}</Col>
+                  </Row>
+                  )}
+              >
+                Coin Ranking URL : <a href={exchange.coinrankingUrl} target="_blank" rel="noreferrer">{`Coin Ranking - `+exchange.name}</a>
+              </Panel>
+            </Collapse>
+            </Col>
+          ))}
     </Col>
   );
 };
